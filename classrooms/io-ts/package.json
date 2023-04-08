@@ -4,8 +4,8 @@
   "type": "module",
   "scripts": {
     "start": "ava -svw --fail-fast",
-    "pretest": "tsc --noEmit",
-    "test": "ava"
+    "test": "ava",
+    "posttest": "tsc --noEmit"
   },
   "dependencies": {
     "@types/node": "^18.15.11",

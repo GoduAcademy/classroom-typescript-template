@@ -10,8 +10,9 @@ This repository is divided into multiple GitHub classrooms, each covering a
 different topic in TypeScript programming. The following are the classrooms that
 are currently available:
 
-- [Intro to `io-ts`](./classrooms//io-ts/README.md): Learn about [`io-ts`](https://gcanti.github.io/io-ts/), a
-runtime type system for IO decoding/encoding.
+- [Intro to `io-ts`](./classrooms//io-ts/README.md): Learn about
+[`io-ts`](https://gcanti.github.io/io-ts/), a runtime type system for IO
+decoding/encoding.
 
 Each classroom contains a set of exercises that will help you practice the
 concepts covered in the classroom. You can complete the exercises directly in

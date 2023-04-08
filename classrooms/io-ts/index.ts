@@ -54,12 +54,12 @@ const unsafeParseUser = (json: string): User => {
   throw new TypeError('Invalid object');
 };
 
-test('unsafeParseUser', async (t) => {
+test('unsafeParseUser', (t) => {
   const USER = {name: 'John', age: 42};
   t.deepEqual(unsafeParseUser(JSON.stringify(USER)), USER);
 
   const INVALID_OBJECTS: unknown[] = [{name: 'John'}, {age: 42}];
-  INVALID_OBJECTS.map((object) =>
+  INVALID_OBJECTS.forEach((object) =>
     t.throws(() => unsafeParseUser(JSON.stringify(object)), {
       instanceOf: TypeError,
     }),
@@ -106,7 +106,7 @@ test('ComplexObject', (t) => {
       ],
     },
   ];
-  VALID_OBJECTS.map((object) => {
+  VALID_OBJECTS.forEach((object) => {
     t.notThrows(() => {
       decode(ComplexObject)(object);
     });
@@ -118,7 +118,7 @@ test('ComplexObject', (t) => {
     {falsyValue: 'foo'},
     {falsyValue: null, arrayOfTuples: [1, 'a']},
   ];
-  INVALID_OBJECTS.map((object) => {
+  INVALID_OBJECTS.forEach((object) => {
     t.throws(() => decode(ComplexObject)(object), {instanceOf: TypeError});
   });
 });
@@ -160,7 +160,6 @@ const NonZeroFinite = (n: number): NonZeroFinite => {
 const divide = (dividend: number, divisor: NonZeroFinite): number =>
   dividend / divisor;
 
-// @ts-expect-error We have to cast 2 to NonZeroFinite
 assert.strictEqual(divide(4, 2), 2);
 
 assert.strictEqual(divide(4, NonZeroFinite(2)), 2);
@@ -189,10 +188,10 @@ const Palindrome = io.never;
 
 test('Palindrome', (t) => {
   const VALID_PALINDROMES = ['racecar', 'level', 'noon'];
-  VALID_PALINDROMES.map((s) => t.true(Palindrome.is(s)));
+  VALID_PALINDROMES.forEach((s) => t.true(Palindrome.is(s)));
 
   const INVALID_PALINDROMES = ['hello', 'world', 'foo'];
-  INVALID_PALINDROMES.map((s) => t.false(Palindrome.is(s)));
+  INVALID_PALINDROMES.forEach((s) => t.false(Palindrome.is(s)));
 });
 
 /*
@@ -215,7 +214,7 @@ const VALID_NUMBER_OR_STRING = [
   {type: 'left', value: 1},
   {type: 'right', value: 'foo'},
 ];
-VALID_NUMBER_OR_STRING.map((v) => {
+VALID_NUMBER_OR_STRING.forEach((v) => {
   assert.doesNotThrow(() => decode(NumberOrString)(v));
 });
 
@@ -223,7 +222,7 @@ const INVALID_NUMBER_OR_STRING = [
   {type: 'right', value: 1},
   {type: 'left', value: 'foo'},
 ];
-INVALID_NUMBER_OR_STRING.map((v) => {
+INVALID_NUMBER_OR_STRING.forEach((v) => {
   assert.throws(() => decode(NumberOrString)(v));
 });
 
@@ -240,7 +239,10 @@ type CustomResult =
   | Result<500, 'Internal server error'>;
 
 // TODO write the Result type
-const Result = <Status, Body>(Status: io.Type<Status>, Body: io.Type<Body>) =>
+const Result = <Status, Body>(
+  status: io.Type<Status>,
+  body: io.Type<Body>,
+): io.Type<Result<Status, Body>> =>
   io.never;
 
 const CustomResult: io.Type<CustomResult> = io.union([
@@ -259,7 +261,7 @@ test('CustomResult', (t) => {
     {status: 404, body: 'Not found'},
     {status: 500, body: 'Internal server error'},
   ];
-  VALID_CUSTOM_RESULTS.map((v) => {
+  VALID_CUSTOM_RESULTS.forEach((v) => {
     t.notThrows(() => decode(CustomResult)(v));
   });
 
@@ -270,7 +272,7 @@ test('CustomResult', (t) => {
     {status: 404, body: 1},
     {status: 500, body: 1},
   ];
-  INVALID_CUSTOM_RESULTS.map((v) =>
+  INVALID_CUSTOM_RESULTS.forEach((v) =>
     t.throws(() => decode(CustomResult)(v), {instanceOf: TypeError}),
   );
 });
@@ -320,13 +322,13 @@ test('StringToNumber', (t) => {
     ['1.1', 1.1, '1.1'],
     ['1e1', 10, '10'],
   ];
-  VALID_NUMBERS.map(([input, value, output]) => {
+  VALID_NUMBERS.forEach(([input, value, output]) => {
     t.is(decode(StringToNumber)(input), value);
     t.is(encode(StringToNumber)(value), output);
   });
 
   const INVALID_NUMBERS = ['foo', 'bar', 'baz'];
-  INVALID_NUMBERS.map((input) => {
+  INVALID_NUMBERS.forEach((input) => {
     t.is(decode(StringToNumber)(input), Number.NaN);
   });
 });
