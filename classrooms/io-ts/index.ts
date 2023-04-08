@@ -239,8 +239,17 @@ type CustomResult =
   | Result<404, 'Not found'>
   | Result<500, 'Internal server error'>;
 
-// TODO write the HTTPResult type
-const CustomResult: io.Type<CustomResult> = io.never;
+// TODO write the Result type
+const Result = <Status, Body>(Status: io.Type<Status>, Body: io.Type<Body>) =>
+  io.never;
+
+const CustomResult: io.Type<CustomResult> = io.union([
+  Result(io.literal(200), io.string),
+  Result(io.literal(401), io.literal('Unauthorized')),
+  Result(io.literal(403), io.literal('Forbidden')),
+  Result(io.literal(404), io.literal('Not found')),
+  Result(io.literal(500), io.literal('Internal server error')),
+]);
 
 test('CustomResult', (t) => {
   const VALID_CUSTOM_RESULTS = [
