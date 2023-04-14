@@ -47,6 +47,7 @@ type User = {name: string; age: number};
 const unsafeParseUser = (json: string): User => {
   const object: unknown = JSON.parse(json);
   if (false /* TODO write the type constraints */) {
+    // @ts-expect-error to be fixed
     const {age, name} = object;
     return {age, name};
   }
@@ -87,6 +88,7 @@ type ComplexObject = {
 };
 
 // TODO write the io-ts type
+// @ts-expect-error to be fixed
 const ComplexObject: io.Type<ComplexObject> = io.never;
 
 test('ComplexObject', (t) => {
@@ -160,6 +162,7 @@ const NonZeroFinite = (n: number): NonZeroFinite => {
 const divide = (dividend: number, divisor: NonZeroFinite): number =>
   dividend / divisor;
 
+// @ts-expect-error test with untyped input
 assert.strictEqual(divide(4, 2), 2);
 
 assert.strictEqual(divide(4, NonZeroFinite(2)), 2);
@@ -239,17 +242,18 @@ type CustomResult =
   | Result<500, 'Internal server error'>;
 
 // TODO write the Result type
-const Result = <Status, Body>(
-  status: io.Type<Status>,
-  body: io.Type<Body>,
-): io.Type<Result<Status, Body>> =>
-  io.never;
+const Result = () => io.never;
 
 const CustomResult: io.Type<CustomResult> = io.union([
+  // @ts-expect-error to be fixed
   Result(io.literal(200), io.string),
+  // @ts-expect-error to be fixed
   Result(io.literal(401), io.literal('Unauthorized')),
+  // @ts-expect-error to be fixed
   Result(io.literal(403), io.literal('Forbidden')),
+  // @ts-expect-error to be fixed
   Result(io.literal(404), io.literal('Not found')),
+  // @ts-expect-error to be fixed
   Result(io.literal(500), io.literal('Internal server error')),
 ]);
 
@@ -323,12 +327,15 @@ test('StringToNumber', (t) => {
     ['1e1', 10, '10'],
   ];
   VALID_NUMBERS.forEach(([input, value, output]) => {
+    // @ts-expect-error to be fixed
     t.is(decode(StringToNumber)(input), value);
+    // @ts-expect-error to be fixed
     t.is(encode(StringToNumber)(value), output);
   });
 
   const INVALID_NUMBERS = ['foo', 'bar', 'baz'];
   INVALID_NUMBERS.forEach((input) => {
+    // @ts-expect-error test with invalid input
     t.is(decode(StringToNumber)(input), Number.NaN);
   });
 });
@@ -374,5 +381,6 @@ test('ProductFromBase64JSON', (t) => {
     Buffer.from(s, 'utf8').toString('base64'),
   );
   t.deepEqual(decode(ProductFromBase64JSON)(bookBase64), book);
+  // @ts-expect-error to be fixed
   t.is(encode(ProductFromBase64JSON)(book), bookBase64);
 });
